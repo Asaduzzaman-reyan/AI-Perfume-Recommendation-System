@@ -44,6 +44,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 
 // Health check endpoint
+app.get('/api', (req, res) => {
+  res.json({ message: 'Scentra API is working!' });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
