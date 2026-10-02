@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { resolve } from 'path';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -65,10 +66,22 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Initialize database and start server
+// Initialize database once for local and serverless execution.
+let databaseInitialization;
+
+export function initializeApp() {
+  if (!databaseInitialization) {
+    databaseInitialization = initializeDatabase();
+  }
+
+  return databaseInitialization;
+}
+
+export { app };
+
 async function startServer() {
   try {
-    await initializeDatabase();
+    await initializeApp();
     console.log('Database initialized successfully');
 
     app.listen(PORT, () => {
@@ -81,4 +94,6 @@ async function startServer() {
   }
 }
 
-startServer();
+if (process.argv[1] && resolve(process.argv[1]) === __filename) {
+  startServer();
+}
